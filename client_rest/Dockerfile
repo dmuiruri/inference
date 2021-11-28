@@ -1,3 +1,5 @@
+# Instructions to build a Docker image used to test the REST endpoints
+
 FROM python:3.9
 
 WORKDIR /usr/src/app
@@ -20,4 +22,4 @@ RUN  pip install aiodns
 
 COPY . .
 
-CMD ["python", "mnist_client.py"]
+CMD ["python", "mnist_client_rest.py"]
