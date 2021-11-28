@@ -37,13 +37,6 @@ json_data = {
     "instances": batch
 }
 
-# Works when tested with local host but something seems to block the use of IP address
-# response_prediction = requests.post('http://128.214.252.11:8501/v1/models/mnist:predict', json=json_data)
-
-# Predict returns the probabilities of the classes 0-9, so we need to pick the highest probability
-# number = np.argmax(response_prediction.json()['predictions'][0])
-
-# print(response_prediction.elapsed.total_seconds())
 
 def get_predictions():
     """
@@ -52,7 +45,10 @@ def get_predictions():
     sys.stdout.write('.')
     sys.stdout.flush()
     response_prediction = requests.post('http://128.214.252.11:8501/v1/models/mnist:predict', json=json_data)
+    # Predict returns the probabilities of the classes 0-9, so we need to pick the highest probability
+    # number = np.argmax(response_prediction.json()['predictions'][0])
     return response_prediction.elapsed.total_seconds()
+    
 
 if __name__ == '__main__':
     resp_time_sec = get_predictions()
