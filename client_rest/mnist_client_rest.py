@@ -51,5 +51,7 @@ def get_predictions():
     
 
 if __name__ == '__main__':
-    resp_time_sec = get_predictions()
+    for _ in range(100):
+        resp_time_sec = get_predictions()
+
     print(f"\n {resp_time_sec}")
