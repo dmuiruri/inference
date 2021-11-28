@@ -23,4 +23,4 @@ RUN  pip install aiodns
 COPY . .
 
 #CMD ["python", "./mnist_client.py", "--num_tests=10", "--server=128.214.252.11:8500", "--concurrency=1"]
-CMD ["python", "./mnist_client.py", "--server=128.214.252.11:8500"]
+CMD ["python", "client/mnist_client.py", "--server=128.214.252.11:8500"]
