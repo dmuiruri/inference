@@ -20,6 +20,9 @@ import threading
 import requests
 import numpy as np
 import pandas as pd
+import asyncio
+import aiohttp
+
 from time import time
 
 import mnist_input_data
@@ -48,10 +51,45 @@ def get_predictions():
     # Predict returns the probabilities of the classes 0-9, so we need to pick the highest probability
     # number = np.argmax(response_prediction.json()['predictions'][0])
     return response_prediction.elapsed.total_seconds()
-    
+
+
+conn = aiohttp.TCPConnector(limit=0)
+
+async def _range(num):
+    """
+    The asyncio library cannot use a regular range object we need to implement an acceptation version
+
+    TypeError: 'async for' requires an object with __aiter__ method, got range
+    """
+    for i in range(num):
+        yield i
+
+async def async_inference(session, url):
+    """
+    Get prediction asynchronously
+    """
+    async with session.post(url, data=json_data) as resp:
+        # print(resp.status)
+        # print(resp.elapsed.total_seconds())
+        sys.stdout.write('.')
+        sys.stdout.flush()
+        resp_time = resp.status #elapsed.total_seconds()
+
+async def async_collect_inferences():
+    """
+    Dispatch inferences
+    """
+    url = 'http://128.214.252.11:8501/v1/models/mnist:predict'
+    async with aiohttp.ClientSession(connector=conn) as session:
+        post_tasks = []
+        async for _ in _range(5):
+            post_tasks.append(async_inference(session, url=url))
+        await asyncio.gather(*post_tasks) # send all at once
+
 
 if __name__ == '__main__':
-    for _ in range(100):
-        resp_time_sec = get_predictions()
-
-    print(f"\n {resp_time_sec}")
+    # for _ in range(100):
+    # resp_time_sec = get_predictions()
+    # print(f"\n {resp_time_sec}")
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(async_collect_inferences())
