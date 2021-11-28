@@ -53,7 +53,7 @@ def get_predictions():
     return response_prediction.elapsed.total_seconds()
 
 
-conn = aiohttp.TCPConnector(limit=0)
+conn = aiohttp.TCPConnector(limit=10)
 
 async def _range(num):
     """
@@ -64,26 +64,27 @@ async def _range(num):
     for i in range(num):
         yield i
 
-async def async_inference(session, url):
+async def async_inference(session):
     """
     Get prediction asynchronously
     """
-    async with session.post(url, data=json_data) as resp:
+    async with session.post('http://128.214.252.11:8501/v1/models/mnist:predict', json=json_data) as resp:
         # print(resp.status)
         # print(resp.elapsed.total_seconds())
         sys.stdout.write('.')
         sys.stdout.flush()
-        resp_time = resp.status #elapsed.total_seconds()
+        resp_status = resp.status #elapsed.total_seconds()
+        await resp.text()
 
-async def async_collect_inferences():
+async def async_collect_inferences(num=5):
     """
     Dispatch inferences
     """
     url = 'http://128.214.252.11:8501/v1/models/mnist:predict'
     async with aiohttp.ClientSession(connector=conn) as session:
         post_tasks = []
-        async for _ in _range(5):
-            post_tasks.append(async_inference(session, url=url))
+        async for _ in _range(num):
+            post_tasks.append(async_inference(session))
         await asyncio.gather(*post_tasks) # send all at once
 
 
