@@ -17,10 +17,11 @@
 
 import sys
 import threading
-
-import numpy
+import requests
+import numpy as np
 import pandas as pd
 from time import time
+
 import mnist_input_data
 
 work_dir = '/tmp'
@@ -48,8 +49,11 @@ def get_predictions():
     """
     Inference querying
     """
+    sys.stdout.write('.')
+    sys.stdout.flush()
     response_prediction = requests.post('http://128.214.252.11:8501/v1/models/mnist:predict', json=json_data)
-    return response_prediction.elapsed.time_seconds()
+    return response_prediction.elapsed.total_seconds()
 
 if __name__ == '__main__':
-    print(get_predictions())
+    resp_time_sec = get_predictions()
+    print(f"\n {resp_time_sec}")
