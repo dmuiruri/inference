@@ -43,7 +43,12 @@ In the remote VM open a browserless Notebook session to be served at port 8889
 jupyter notebook --no-browser --port=8889
 ```
 
-The in the local machine enable port forwarding to the remote VM port
+Enable port forwarding to the remote VM port from the local machine
 ```
 ssh -N -f -L localhost:8888:localhost:8889 username@<CSC_public_ip/your_remote_host_name> -i <path/to/public/key/file>
+```
+
+The notebook can now be accessed from the local machine through thr browser and defining the port 8888
+```
+localhost:8888
 ```
