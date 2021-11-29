@@ -40,6 +40,7 @@ json_data = {
     "instances": batch
 }
 
+response_times = list()
 
 def get_predictions():
     """
@@ -68,17 +69,33 @@ async def async_inference(session):
     """
     Get prediction asynchronously
     """
+    start = time()
     async with session.post('http://128.214.252.11:8501/v1/models/mnist:predict', json=json_data) as resp:
-        # print(resp.status)
-        # print(resp.elapsed.total_seconds())
         sys.stdout.write('.')
         sys.stdout.flush()
         resp_status = resp.status #elapsed.total_seconds()
         await resp.text()
+    elapsed = time() - start
+    response_times.append(elapsed)
 
-async def async_collect_inferences(num=5):
+# async def async_collect_inferences(num=10):
+#     """
+#     Dispatch inferences
+
+#     We need 10000 tests
+#     """
+#     url = 'http://128.214.252.11:8501/v1/models/mnist:predict'
+#     async with aiohttp.ClientSession(connector=conn) as session:
+#         post_tasks = []
+#         async for _ in _range(num):
+#             post_tasks.append(async_inference(session))
+#         await asyncio.gather(*post_tasks) # send all at once
+
+async def async_collect_inferences(num=10):
     """
     Dispatch inferences
+
+    We need 10000 tests
     """
     url = 'http://128.214.252.11:8501/v1/models/mnist:predict'
     async with aiohttp.ClientSession(connector=conn) as session:
@@ -93,4 +110,6 @@ if __name__ == '__main__':
     # resp_time_sec = get_predictions()
     # print(f"\n {resp_time_sec}")
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(async_collect_inferences())
+    loop.run_until_complete(async_collect_inferences(num=3000))
+    print(f'\n {len(response_times)}')
+    np.save('./client_rest/data/resp_3000_3', response_times)
