@@ -1,6 +1,18 @@
 # inference
 Reviewing inference setup, effect of various variables to the inference rate in ML setups
 
+## TODO Items
+
+* Conduct benchmark against dedicated [gRPC](https://ghz.sh/) test tool
+* Conduct benchmark against a [REST](https://www.bswen.com/2019/08/others-Use-Apache-Bench(ab)-command-to-test-RESTful-apis-example.html) API testing tool
+Results from these tools help to  establish the reliability of our own implementation.
+
+Open Questions
+* How much of that time is spent by the model inference itself not transport layer handshakes
+* Is this a CPU or IO bound problem
+* Is the server applying some form of caching
+* Impact of schema and data type (JSON, Binary, String etc)
+
 
 ## Client
 
