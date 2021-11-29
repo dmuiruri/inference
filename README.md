@@ -6,6 +6,7 @@ Reviewing inference setup, effect of various variables to the inference rate in 
 * Conduct benchmark against dedicated [gRPC](https://ghz.sh/) test tool
 * Conduct benchmark against a [REST](https://www.bswen.com/2019/08/others-Use-Apache-Bench(ab)-command-to-test-RESTful-apis-example.html) API testing tool
 Results from these tools help to  establish the reliability of our own implementation.
+* Test the feasibility of using [wireshark](https://www.wireshark.org/) to see low level traffic
 
 Open Questions
 * How much of that time is spent by the model inference itself not transport layer handshakes
