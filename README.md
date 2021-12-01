@@ -60,8 +60,10 @@ Installed wireshark, tshark (wireshark cli) and tcpdump(available by default in 
 
 The goal is to capture the traffic remotely( VM and Container) and the
 files can be analyzed locally.  When recording the pcap file `tshark
--i wlan0 -w capture-output.pcap` may require the output file to be
-created somewhere else other than the user directory.
+-i ens3 -w capture-output.pcap` may require the output file to be
+created somewhere else other than the user directory and the file
+contains the right permissions to facilitate `scp` of the file to a
+local machine.
 
 There is a good
 [tutorial](https://opensource.com/article/20/1/wireshark-linux-tshark)

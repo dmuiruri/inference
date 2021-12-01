@@ -169,7 +169,7 @@ def main(_):
   if not FLAGS.server:
     print('please specify server host:port')
     return
-  for concurrent_reqs in [100, 200, 300, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000]:
+  for concurrent_reqs in [500]: #100, 200, 300, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000
     # error_rate = do_inference(FLAGS.server, FLAGS.work_dir, FLAGS.concurrency, FLAGS.num_tests)
     error_rate = do_inference(FLAGS.server, FLAGS.work_dir, concurrent_reqs, 10000)
     print('\nInference error rate: %s%%' % (error_rate * 100))
