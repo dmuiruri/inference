@@ -53,3 +53,16 @@ The notebook can now be accessed from the local machine through the browser by a
 ```
 localhost:8888
 ```
+
+## Traffic Analysis (Low level)
+
+Installed wireshark, tshark (wireshark cli) and tcpdump(available by default in unix)
+
+The goal is to capture the traffic remotely( VM and Container) and the
+files can be analyzed locally.  When recording the pcap file `tshark
+-i wlan0 -w capture-output.pcap` may require the output file to be
+created somewhere else other than the user directory.
+
+There is a good
+[tutorial](https://opensource.com/article/20/1/wireshark-linux-tshark)
+on how to use tshark.
