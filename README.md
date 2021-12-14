@@ -8,6 +8,7 @@ Reviewing inference setup, effect of various variables to the inference rate in 
 Results from these tools help to  establish the reliability of our own implementation.
 * Test the feasibility of using [wireshark](https://www.wireshark.org/) to see low level traffic
 * Testing the effect of power using the [PowerAPI](http://powerapi.org/)
+* Performance testing can be performed using [locust](https://docs.locust.io/en/stable/index.html)
 
 Open Questions
 * How much of that time is spent by the model inference itself not transport layer handshakes
