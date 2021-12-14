@@ -22,6 +22,7 @@ import numpy as np
 import pandas as pd
 import asyncio
 import aiohttp
+import timeit
 
 from time import time
 
@@ -51,10 +52,11 @@ def get_predictions():
     response_prediction = requests.post('http://128.214.252.11:8501/v1/models/mnist:predict', json=json_data)
     # Predict returns the probabilities of the classes 0-9, so we need to pick the highest probability
     # number = np.argmax(response_prediction.json()['predictions'][0])
-    return response_prediction.elapsed.total_seconds()
+    # return response_prediction.elapsed.total_seconds()
+    return
 
 
-conn = aiohttp.TCPConnector(limit=10)
+conn = aiohttp.TCPConnector(limit=0)
 
 async def _range(num):
     """
@@ -109,7 +111,14 @@ if __name__ == '__main__':
     # for _ in range(100):
     # resp_time_sec = get_predictions()
     # print(f"\n {resp_time_sec}")
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(async_collect_inferences(num=3000))
-    print(f'\n {len(response_times)}')
-    np.save('./client_rest/data/resp_3000_3', response_times)
+
+    # Here we test using timeit but it is synchronous
+    iterations = 200
+    result = timeit.timeit(get_predictions(), number=iterations)
+    print(f"\n {result}, {1000 * result/iterations}")
+
+    # Here we use asyncio to create asynchronous requests
+    # loop = asyncio.get_event_loop()
+    # loop.run_until_complete(async_collect_inferences(num=3000))
+    # print(f'\n {len(response_times)}')
+    # np.save('./client_rest/data/resp_3000_3', response_times)
