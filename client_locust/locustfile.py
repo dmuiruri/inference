@@ -11,6 +11,7 @@ import time
 import numpy as np
 import pandas as pd
 import json
+import sys
 from locust import HttpUser, task, between
 
 import mnist_input_data
@@ -38,8 +39,8 @@ class httpClient(HttpUser):
         """Get prediction for a single image from a re
 
         """
-        sys.stdout.write('.')
-        sys.stdout.flush()
+        # sys.stdout.write('.')
+        # sys.stdout.flush()
         response_prediction = self.client.post('http://128.214.252.11:8501/v1/models/mnist:predict', json=json_data)
         return
 
