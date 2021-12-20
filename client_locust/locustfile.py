@@ -34,10 +34,12 @@ class httpClient(HttpUser):
     """A http user class to run HTTP requests to the model's REST endpoint
 
     """
+    time_limit = 4
+
     @tag('httpuser')
     @task
     def predict_single(self):
-        """Get prediction for a single image from a re
+        """Get prediction for a single image from are
 
         """
         # sys.stdout.write('.')
@@ -45,16 +47,16 @@ class httpClient(HttpUser):
         response_prediction = self.client.post('http://128.214.252.11:8501/v1/models/mnist:predict', json=json_data)
         return
 
-class fastHttpClient(FastHttpUser):
-    """A user based on geventhttpclient with support faster but increases
-    the number of requests
+# class fastHttpClient(FastHttpUser):
+#     """A user based on geventhttpclient with support faster but increases
+#     the number of requests
 
-    """
-    @tag('fasthttpuser')
-    @task
-    def predict_single(self):
-        response_prediction = self.client.post('http://128.214.252.11:8501/v1/models/mnist:predict', json=json_data)
-        return
+#     """
+#     @tag('fasthttpuser')
+#     @task
+#     def predict_single(self):
+#         response_prediction = self.client.post('http://128.214.252.11:8501/v1/models/mnist:predict', json=json_data)
+#         return
 
 if __name__ == "__main__":
     pass
