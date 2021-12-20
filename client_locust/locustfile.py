@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 import json
 import sys
-from locust import HttpUser, task, between
+from locust import HttpUser, FastHttpUser, task, tag, between
 
 import mnist_input_data
 
@@ -34,6 +34,7 @@ class httpClient(HttpUser):
     """A http user class to run HTTP requests to the model's REST endpoint
 
     """
+    @tag('httpuser')
     @task
     def predict_single(self):
         """Get prediction for a single image from a re
@@ -44,6 +45,16 @@ class httpClient(HttpUser):
         response_prediction = self.client.post('http://128.214.252.11:8501/v1/models/mnist:predict', json=json_data)
         return
 
+class fastHttpClient(FastHttpUser):
+    """A user based on geventhttpclient with support faster but increases
+    the number of requests
+
+    """
+    @tag('fasthttpuser')
+    @task
+    def predict_single(self):
+        response_prediction = self.client.post('http://128.214.252.11:8501/v1/models/mnist:predict', json=json_data)
+        return
 
 if __name__ == "__main__":
     pass
