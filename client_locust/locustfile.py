@@ -12,9 +12,12 @@ import numpy as np
 import pandas as pd
 import json
 import sys
-from locust import HttpUser, FastHttpUser, task, tag, between
+from locust import HttpUser, FastHttpUser, task, tag, between, stats
 
 import mnist_input_data
+
+stats.CSV_STATS_INTERVAL_SEC = 1 # default is 1 second
+stats.CSV_STATS_FLUSH_INTERVAL_SEC = 10 # Determines how often the data is flushed to disk, default is 10 seconds
 
 work_dir = '/tmp'
 
@@ -34,9 +37,9 @@ class httpClient(HttpUser):
     """A http user class to run HTTP requests to the model's REST endpoint
 
     """
-    time_limit = 4
+    host = 'http://128.214.252.11'
 
-    @tag('httpuser')
+    @tag('httpclient')
     @task
     def predict_single(self):
         """Get prediction for a single image from are
@@ -52,6 +55,8 @@ class httpClient(HttpUser):
 #     the number of requests
 
 #     """
+#     time_limit = 2
+    
 #     @tag('fasthttpuser')
 #     @task
 #     def predict_single(self):
