@@ -23,14 +23,6 @@ stats.CSV_STATS_FLUSH_INTERVAL_SEC = 10 # Determines how often the data is flush
 work_dir = '/tmp'
 
 test_data_set = mnist_input_data.read_data_sets(work_dir).test
-smallBatchSize = 1
-img_s, label_s = test_data_set.next_batch(smallBatchSize)
-smallBatch = np.repeat(img_s, smallBatchSize, axis=0).tolist()
-json_data_s = {
-    "signature_name": 'predict_images',
-    "instances": smallBatch
-}
-
 largeBatchSize = 16
 img_l, label_l = test_data_set.next_batch(largeBatchSize)
 largeBatch = np.repeat(img_l, largeBatchSize, axis=0).tolist()
@@ -38,25 +30,6 @@ json_data_l = {
     "signature_name": 'predict_images',
     "instances": largeBatch
 }
-
-# url = ':8501/v1/models/mnist:predict'
-
-class httpClientSingle(HttpUser):
-    """A http user class to run HTTP requests to the model's REST endpoint
-
-    """
-    host = 'http://128.214.252.11'
-
-    @tag('singleinference')
-    @task
-    def predict_single(self):
-        """
-        Get prediction for a single image
-        """
-        # sys.stdout.write('.')
-        # sys.stdout.flush()
-        response_prediction = self.client.post(':8501/v1/models/mnist:predict', json=json_data_s)
-        return
 
 class httpClientBatch(HttpUser):
     """
@@ -87,7 +60,6 @@ class httpClientBatch(HttpUser):
 #         return
 
 if __name__ == "__main__":
-    run_single_user(httpClientSingle)
     run_single_user(httpClientBatch)
-    # cmd = 'locust -f locustfile.py --headless --csv=rest --csv-full-history -u 100 -r 10 --run-time 5m'
+    # cmd = 'locust -f locust_rest_batch.py --headless --csv=rest --csv-full-history -u 100 -r 10 --run-time 5m'
     # subprocess.run(cmd, shell=True)

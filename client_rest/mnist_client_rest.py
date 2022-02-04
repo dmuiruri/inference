@@ -108,17 +108,13 @@ async def async_collect_inferences(num=10):
 
 
 if __name__ == '__main__':
-    # for _ in range(100):
-    # resp_time_sec = get_predictions()
-    # print(f"\n {resp_time_sec}")
-
     # Here we test using timeit but it is synchronous
-    iterations = 200
-    result = timeit.timeit(get_predictions(), number=iterations)
-    print(f"\n {result}, {1000 * result/iterations}")
+    # iterations = 1000
+    # result = timeit.timeit(get_predictions, number=iterations)
+    # print(f"\n iterations: {iterations} time spent: {result}, {1000 * (result/iterations)}")
 
     # Here we use asyncio to create asynchronous requests
-    # loop = asyncio.get_event_loop()
-    # loop.run_until_complete(async_collect_inferences(num=3000))
-    # print(f'\n {len(response_times)}')
-    # np.save('./client_rest/data/resp_3000_3', response_times)
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(async_collect_inferences(num=100))
+    print(f'\n {len(response_times)}')
+    np.save('./client_rest/data/response.npy', response_times)
