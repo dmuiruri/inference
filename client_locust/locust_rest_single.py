@@ -48,19 +48,6 @@ class httpClientSingle(HttpUser):
         response_prediction = self.client.post(':8501/v1/models/mnist:predict', json=json_data_s)
         return
 
-# class fastHttpClient(FastHttpUser):
-#     """A user based on geventhttpclient with support faster but increases
-#     the number of requests
-
-#     """
-#     time_limit = 2
-    
-#     @tag('fasthttpuser')
-#     @task
-#     def predict_single(self):
-#         response_prediction = self.client.post('http://128.214.252.11:8501/v1/models/mnist:predict', json=json_data)
-#         return
-
 if __name__ == "__main__":
     run_single_user(httpClientSingle)
     # cmd = 'locust -f locust_rest_single.py --headless --csv=rest --csv-full-history -u 100 -r 10 --run-time 5m'

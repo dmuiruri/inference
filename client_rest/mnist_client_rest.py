@@ -74,11 +74,14 @@ async def async_inference(session):
     start = time()
     async with session.post('http://128.214.252.11:8501/v1/models/mnist:predict', json=json_data) as resp:
         sys.stdout.write('.')
+        sys.stdout.write(resp)
+        break
         sys.stdout.flush()
-        resp_status = resp.status #elapsed.total_seconds()
+        resp_status = resp.status
+        resp_time = resp.elapsed.total_seconds()
         await resp.text()
     elapsed = time() - start
-    response_times.append(elapsed)
+    response_times.append(resp_time)#(elapsed)
 
 # async def async_collect_inferences(num=10):
 #     """
@@ -115,6 +118,6 @@ if __name__ == '__main__':
 
     # Here we use asyncio to create asynchronous requests
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(async_collect_inferences(num=100))
+    loop.run_until_complete(async_collect_inferences(num=1000))
     print(f'\n {len(response_times)}')
     np.save('./client_rest/data/response.npy', response_times)

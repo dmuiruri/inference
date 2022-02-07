@@ -23,7 +23,7 @@ stats.CSV_STATS_FLUSH_INTERVAL_SEC = 10 # Determines how often the data is flush
 work_dir = '/tmp'
 
 test_data_set = mnist_input_data.read_data_sets(work_dir).test
-largeBatchSize = 16
+largeBatchSize = 4
 img_l, label_l = test_data_set.next_batch(largeBatchSize)
 largeBatch = np.repeat(img_l, largeBatchSize, axis=0).tolist()
 json_data_l = {
@@ -31,7 +31,7 @@ json_data_l = {
     "instances": largeBatch
 }
 
-class httpClientBatch(HttpUser):
+class restClientBatch(HttpUser):
     """
     A http user class to run batch reqeusts on a model endpoint
     """
@@ -60,6 +60,6 @@ class httpClientBatch(HttpUser):
 #         return
 
 if __name__ == "__main__":
-    run_single_user(httpClientBatch)
+    run_single_user(restClientBatch)
     # cmd = 'locust -f locust_rest_batch.py --headless --csv=rest --csv-full-history -u 100 -r 10 --run-time 5m'
     # subprocess.run(cmd, shell=True)
