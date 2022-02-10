@@ -10,6 +10,7 @@ from __future__ import print_function
 
 import sys
 import threading
+import numpy as np
 
 # This is a placeholder for a Google-internal import.
 
@@ -39,16 +40,12 @@ stats.CSV_STATS_INTERVAL_SEC = 1 # default is 1 second
 stats.CSV_STATS_FLUSH_INTERVAL_SEC = 10 # frequency of data flushing to disk, default is 10 seconds
 
 work_dir = '/tmp'
-# host = 'http://128.214.252.11'
-# grpcport = '8500'
 test_data_set = mnist_input_data.read_data_sets(work_dir).test
 
-# channel = grpc.insecure_channel(host)
-# stub = prediction_service_pb2_grpc.PredictionServiceStub(channel)
-# request = predict_pb2.PredictRequest()
-# request.model_spec.name = 'mnist'
-# request.model_spec.signature_name = 'predict_images'
-image, label = test_data_set.next_batch(1)
+batch_size = 1
+image, label = test_data_set.next_batch(batch_size)
+batch = np.repeat(image[0], batch_size, axis=0).tolist()
+print(label, image[0].size)
 
 class GrpcClient:
     def __init__(self, environment, stub):
@@ -72,7 +69,7 @@ class GrpcClient:
             start_perf_counter = time.perf_counter()
             try:
                 request_meta["response"] = func(*args, **kwargs)
-                # request_meta["response_length"] = len(request_meta["response"].message)
+                #request_meta["response_length"] = len(request_meta["response"].message)
             except grpc.RpcError as e:
                 request_meta["exception"] = e
             request_meta["response_time"] = (time.perf_counter() - start_perf_counter) * 1000
@@ -97,44 +94,31 @@ class GrpcUser(User):
 
 class SingleGrpcUser(GrpcUser):
     host = "128.214.252.11:8500"
-    # host = 'http://128.214.252.11:8500' # /v1/models/mnist:predict
-    stub_class = prediction_service_pb2_grpc.PredictionServiceStub #(channel)
+    stub_class = prediction_service_pb2_grpc.PredictionServiceStub
     request = predict_pb2.PredictRequest()
+
+    def prepare_grpc_request(self, model_name, signature_name, data):
+        request = predict_pb2.PredictRequest()
+        request.model_spec.name = model_name
+        request.model_spec.signature_name = signature_name
+        request.inputs['images'].CopyFrom(
+            tf.make_tensor_proto(data, shape=[1, image[0].size], dtype=None))
+        return request
 
     @task
     def predict_single(self):
         """
         Get prediction for a single image
         """
+        self.request = self.prepare_grpc_request('mnist', 'predict_images', batch)
         if not self._channel_closed:
-            sys.stdout.write('.')
-            sys.stdout.flush()
-            self.request.model_spec.name: "mnist"
-            self.request.model_spec.signature_name: "predict_images"
-            self.request.inputs['images'].CopyFrom(
-                tf.make_tensor_proto(image[0], shape=[1, image[0].size]))
-            # result_future = stub.Predict.future(request, 5.0)  #5 seconds
-            response = self.client.Predict(self.request, 5.0)  #5 seconds
-        return
 
-# class grpcClientSingle(HttpUser):
-#     """A http user class to run HTTP requests to the model's REST endpoint
+            # Returns a PredictResponse Object which contains the
+            # probabilities of the classes 0-9, so we need to pick the
+            # highest probability to determine the prediction. 
+            response = self.client.Predict(self.request, timeout=5.0)  #5 seconds
+            return
 
-#     """
-#     host = 'http://128.214.252.11'
-
-#     @tag('single_inference_grpc')
-#     @task
-#     def predict_single(self):
-#         """
-#         Get prediction for a single image
-#         """
-#         # sys.stdout.write('.')
-#         # sys.stdout.flush()
-#         request.inputs['images'].CopyFrom(
-#             tf.make_tensor_proto(image[0], shape=[1, image[0].size]))
-#         result_future = stub.Predict.future(request, 5.0)  # 5 seconds
-#         return
 
 if __name__ == "__main__":
     run_single_user(SingleGrpcUser)
