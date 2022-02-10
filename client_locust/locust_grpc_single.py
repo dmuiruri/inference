@@ -12,29 +12,19 @@ import sys
 import threading
 import numpy as np
 
-# This is a placeholder for a Google-internal import.
-
 import grpc
 import numpy
 import tensorflow as tf
 import pandas as pd
 import time
-
-from tensorflow_serving.apis import predict_pb2
-from tensorflow_serving.apis import prediction_service_pb2_grpc
 import mnist_input_data
 import grpc.experimental.gevent as grpc_gevent
 
-grpc_gevent.init_gevent()
-tf.compat.v1.app.flags.DEFINE_integer(
-    'concurrency', 1, 'maximum number of concurrent inference requests')
-#tf.compat.v1.app.flags.DEFINE_integer('num_tests', 100, 'Number of test images')
-tf.compat.v1.app.flags.DEFINE_string('server', '',
-                                     'PredictionService host:port')
-tf.compat.v1.app.flags.DEFINE_string('work_dir', '/tmp', 'Working directory. ')
-FLAGS = tf.compat.v1.app.flags.FLAGS
-
+from tensorflow_serving.apis import predict_pb2
+from tensorflow_serving.apis import prediction_service_pb2_grpc
 from locust import HttpUser, User, task, tag, between, stats, run_single_user
+
+grpc_gevent.init_gevent()
 
 stats.CSV_STATS_INTERVAL_SEC = 1 # default is 1 second
 stats.CSV_STATS_FLUSH_INTERVAL_SEC = 10 # frequency of data flushing to disk, default is 10 seconds
@@ -42,7 +32,7 @@ stats.CSV_STATS_FLUSH_INTERVAL_SEC = 10 # frequency of data flushing to disk, de
 work_dir = '/tmp'
 test_data_set = mnist_input_data.read_data_sets(work_dir).test
 
-batch_size = 1
+batch_size = 4
 image, label = test_data_set.next_batch(batch_size)
 batch = np.repeat(image[0], batch_size, axis=0).tolist()
 print(label, image[0].size)
