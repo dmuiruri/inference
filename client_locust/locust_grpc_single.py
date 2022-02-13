@@ -4,14 +4,13 @@
 locust framework.
 
 Supports more advansed user simulation features.
-
 """
+
 from __future__ import print_function
 
 import sys
 import threading
 import numpy as np
-
 import grpc
 import numpy
 import tensorflow as tf
@@ -32,7 +31,7 @@ stats.CSV_STATS_FLUSH_INTERVAL_SEC = 10 # frequency of data flushing to disk, de
 work_dir = '/tmp'
 test_data_set = mnist_input_data.read_data_sets(work_dir).test
 
-batch_size = 4
+batch_size = 1
 image, label = test_data_set.next_batch(batch_size)
 batch = np.repeat(image[0], batch_size, axis=0).tolist()
 print(label, image[0].size)
@@ -92,7 +91,7 @@ class SingleGrpcUser(GrpcUser):
         request.model_spec.name = model_name
         request.model_spec.signature_name = signature_name
         request.inputs['images'].CopyFrom(
-            tf.make_tensor_proto(data, shape=[1, image[0].size], dtype=None))
+            tf.make_tensor_proto(data, shape=[batch_size, image[0].size], dtype=None))
         return request
 
     @task
@@ -106,7 +105,7 @@ class SingleGrpcUser(GrpcUser):
             # Returns a PredictResponse Object which contains the
             # probabilities of the classes 0-9, so we need to pick the
             # highest probability to determine the prediction. 
-            response = self.client.Predict(self.request, timeout=5.0)  #5 seconds
+            response = self.client.Predict(self.request, timeout=None)  #5 seconds
             return
 
 
