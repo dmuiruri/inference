@@ -23,7 +23,7 @@ stats.CSV_STATS_FLUSH_INTERVAL_SEC = 10 # Determines how often the data is flush
 work_dir = '/tmp'
 
 test_data_set = mnist_input_data.read_data_sets(work_dir).test
-largeBatchSize = 4
+largeBatchSize = 16
 img_l, label_l = test_data_set.next_batch(largeBatchSize)
 largeBatch = np.repeat(img_l, largeBatchSize, axis=0).tolist()
 json_data_l = {
