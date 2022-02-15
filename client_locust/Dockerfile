@@ -3,6 +3,10 @@ FROM python:3
 
 WORKDIR /usr/src/app
 
+# Environment variables
+ENV SERVER=http://127.0.0.1
+ENV BATCHSIZE=2
+
 RUN mkdir ./tmp
 RUN mkdir ./stats
 
