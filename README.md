@@ -8,7 +8,7 @@ Reviewing inference setup, effect of various variables to the inference rate in 
 Results from these tools help to  establish the reliability of our own implementation.
 * Test the feasibility of using [wireshark](https://www.wireshark.org/) to see low level traffic
 * Testing the effect of power using the [PowerAPI](http://powerapi.org/)
-* Performance testing can be performed using [locust](https://docs.locust.io/en/stable/index.html)
+* Adopt [locust](https://docs.locust.io/en/stable/index.html) testing framework
 
 Open Questions
 * How much of that time is spent by the model inference itself not transport layer handshakes
@@ -29,7 +29,42 @@ docker run -p 8501:8501 --mount type=bind,source=/tmp/mnist,target=/models/mnist
 
 ## Clients
 
-### Image Building
+### Locust Clients
+
+Build the clients based on the respective Dockefiles
+```
+sudo docker build . -t rest_batch_locust
+sudo docker build . -t grpc_batch_locust
+```
+
+We use locust performance testing framework to generate traffic and to
+collect statistics. An example of launching a locust client where the
+--host flag indicates the server IP address where TFServing is running.
+
+The BATCHSIZE and SERVER environment variables allows the user to
+configure these settings locally. Testing different batch sizes is
+facilitated by changing the BATCHSIZE but the logs will be overwritten
+after every run -(move/save previous logs when necessary).
+
+The --mount flag ensures the user can access the logs from the
+container by providing a local directory where the container can store
+the logs.
+
+```
+docker run --mount type=bind,source=/home/stats,target=/usr/src/app/stats -e "SERVER=http://127.x.x.x" -e "BATCHSIZE=4" rest_batch_locust
+
+```
+The resulting statistics files are stored in a stats folder.
+
+Currently there are four type of user clients:
+* REST single (Multiple users each issuing a single rest request
+* gRPC single (Multiple users each issuing a single grpc requst
+* REST batch (Multiple users each issuing a batch reqeuests to the REST endpoint
+* gRPC batch (Multiple usesrs each issuing batch requests to the gRPC endpoint
+
+### Basic Clients
+
+Image Building
 
 There are two clients (gRPC and REST) which can be built to generate
 independent traffic to the respective servers
@@ -37,7 +72,7 @@ independent traffic to the respective servers
 sudo docker build . -t mnist_client_rest
 sudo docker build . -t mnist_client_grpc
 ```
-### Running the client containers
+#### Running the client containers
 
 The client collects some statistics which we store in the VM in a
 location shared between the client container(volume) and the VM.
@@ -45,18 +80,6 @@ location shared between the client container(volume) and the VM.
 sudo docker run --mount type=bind,source=/home/ubuntu/infer/client_grpc/data,target=/usr/src/app/data mnist_client_rest
 sudo docker run --mount type=bind,source=/home/ubuntu/infer/client_grpc/data,target=/usr/src/app/data mnist_client_grpc
 ```
-### Locust Clients
-We use locust performance testing framework(client_locust folder) to generate traffic and to collect statistics. An example of launching a locust client:
-
-```
-locust -f locust_grpc_batch.py --headless --csv=grpc_batch --csv-full-history -u 500 -r 10 --run-time 3m
-```
-Currently there are four type of user clients:
-* REST single (Multiple users each issuing a single rest request
-* gRPC single (Multiple users each issuing a single grpc requst
-* REST batch (Multiple users each issuing a batch reqeuests to the REST endpoint
-* gRPC batch (Multiple usesrs each issuing batch requests to the gRPC endpoint
-
 ## Data Analysis
 
 To avoid transfer of data from the remote VM, we open a Jupyter
