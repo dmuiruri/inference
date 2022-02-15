@@ -45,7 +45,7 @@ location shared between the client container(volume) and the VM.
 sudo docker run --mount type=bind,source=/home/ubuntu/infer/client_grpc/data,target=/usr/src/app/data mnist_client_rest
 sudo docker run --mount type=bind,source=/home/ubuntu/infer/client_grpc/data,target=/usr/src/app/data mnist_client_grpc
 ```
-## Locust Clients
+### Locust Clients
 We use locust performance testing framework(client_locust folder) to generate traffic and to collect statistics
 Currently there are four type of user clients:
 * REST single (Multiple users each issuing a single rest request
@@ -72,6 +72,17 @@ The notebook can now be accessed from the local machine through the browser by a
 ```
 localhost:8888
 ```
+### Locust performance data
+Performance statistics can be collected from locust in headless mode as follows
+```
+locust -f locust_grpc_batch.py --headless --csv=grpc_batch --csv-full-history -u 500 -r 10 --run-time 3m
+```
+This results in a number of files
+(i) client_locust/grpc_batch_exceptions.csv
+(ii) client_locust/grpc_batch_failures.csv
+(iii) client_locust/grpc_batch_stats.csv
+(iv) client_locust/grpc_batch_stats_history.csv
+The fourth file contains historical statistics which we analyze.
 
 ## Traffic Analysis (Low level)
 
