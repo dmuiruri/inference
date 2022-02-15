@@ -1,7 +1,8 @@
 # Backups files from editors and tools
-**/*.*~
-**/*.*#
+**/*~
+**/*#
 **/__pycache__/
+**/*csv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
