@@ -35,7 +35,7 @@ class restClientBatch(HttpUser):
     """
     A http user class to run batch reqeusts on a model endpoint
     """
-    host = 'http://128.214.252.11' # change if different host
+    #host = 'http://128.214.252.11' # change if different host
     
     @tag('batchinference')
     @task
