@@ -13,6 +13,7 @@ import pandas as pd
 import json
 import sys
 import subprocess
+import os
 
 from locust import HttpUser, FastHttpUser, task, tag, between, stats, run_single_user
 import mnist_input_data
@@ -23,19 +24,20 @@ stats.CSV_STATS_FLUSH_INTERVAL_SEC = 10 # Determines how often the data is flush
 work_dir = './tmp'
 
 test_data_set = mnist_input_data.read_data_sets(work_dir).test
-largeBatchSize = 4
-img_l, label_l = test_data_set.next_batch(largeBatchSize)
-largeBatch = np.repeat(img_l, largeBatchSize, axis=0).tolist()
+batch_size = int(os.environ['BATCHSIZE'])
+img_l, label_l = test_data_set.next_batch(batch_size)
+batch = np.repeat(img_l, batch_size, axis=0).tolist()
 json_data_l = {
     "signature_name": 'predict_images',
-    "instances": largeBatch
+    "instances": batch
 }
 
 class restClientBatch(HttpUser):
     """
     A http user class to run batch reqeusts on a model endpoint
     """
-    #host = 'http://128.214.252.11' # change if different host
+    # host = 'http://128.214.252.11' # change if different host
+    host = os.environ['SERVER']
     
     @tag('batchinference')
     @task
