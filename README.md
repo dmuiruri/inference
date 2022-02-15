@@ -16,8 +16,18 @@ Open Questions
 * Is the server applying some form of caching
 * Impact of schema and data type (JSON, Binary, String etc)
 
+## Server
+We start two independent servers from Tensorflow Serving, each serving the model from independent endpoints/ports
+grpc server cmd: 
+```
+docker run -p 8500:8500 --mount type=bind,source=/tmp/mnist,target=/models/mnist -e MODEL_NAME=mnist --name tf_serving_mnist_grpc -t tensorflow/serving
+```
+rest server cmd:
+```
+docker run -p 8501:8501 --mount type=bind,source=/tmp/mnist,target=/models/mnist -e MODEL_NAME=mnist  --name tf_serving_mnist_rest -t tensorflow/serving
+```
 
-## Client
+## Clients
 
 ### Image Building
 
@@ -35,6 +45,13 @@ location shared between the client container(volume) and the VM.
 sudo docker run --mount type=bind,source=/home/ubuntu/infer/client_grpc/data,target=/usr/src/app/data mnist_client_rest
 sudo docker run --mount type=bind,source=/home/ubuntu/infer/client_grpc/data,target=/usr/src/app/data mnist_client_grpc
 ```
+## Locust Clients
+We use locust performance testing framework(client_locust folder) to generate traffic and to collect statistics
+Currently there are four type of user clients:
+* REST single (Multiple users each issuing a single rest request
+* gRPC single (Multiple users each issuing a single grpc requst
+* REST batch (Multiple users each issuing a batch reqeuests to the REST endpoint
+* gRPC batch (Multiple usesrs each issuing batch requests to the gRPC endpoint
 
 ## Data Analysis
 
