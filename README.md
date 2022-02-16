@@ -33,8 +33,8 @@ docker run -p 8501:8501 --mount type=bind,source=/tmp/mnist,target=/models/mnist
 
 Build the clients based on the respective Dockefiles
 ```
-sudo docker build . -t rest_batch_locust
-sudo docker build . -t grpc_batch_locust
+sudo docker build . -f rest.Dockerfile -t dmuiruri/rest_batch_locust
+sudo docker build . -f grpc.Dockerfile -t dmuiruri/grpc_batch_locust
 ```
 
 We use locust performance testing framework to generate traffic and to
