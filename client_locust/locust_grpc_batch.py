@@ -18,6 +18,7 @@ import pandas as pd
 import time
 import mnist_input_data
 import grpc.experimental.gevent as grpc_gevent
+import os
 
 from tensorflow_serving.apis import predict_pb2
 from tensorflow_serving.apis import prediction_service_pb2_grpc
@@ -28,10 +29,10 @@ grpc_gevent.init_gevent()
 stats.CSV_STATS_INTERVAL_SEC = 1 # default is 1 second
 stats.CSV_STATS_FLUSH_INTERVAL_SEC = 10 # frequency of data flushing to disk, default is 10 seconds
 
-work_dir = '/tmp'
+work_dir = './tmp'
 test_data_set = mnist_input_data.read_data_sets(work_dir).test
 
-batch_size = 16
+batch_size = int(os.environ['BATCHSIZE'])
 image, label = test_data_set.next_batch(batch_size)
 batch = np.repeat(image[0], batch_size, axis=0).tolist()
 print(label, image[0].size)
@@ -82,7 +83,8 @@ class GrpcUser(User):
         self.client = GrpcClient(environment, stub)
 
 class SingleGrpcUser(GrpcUser):
-    host = "128.214.252.11:8500"
+    #host = "128.214.252.11:8500"
+    host = os.environ['SERVER']
     stub_class = prediction_service_pb2_grpc.PredictionServiceStub
     request = predict_pb2.PredictRequest()
 
