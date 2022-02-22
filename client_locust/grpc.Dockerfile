@@ -7,7 +7,7 @@ WORKDIR /usr/src/app
 
 # Environment variables
 ENV SERVER=http://127.0.0.1
-ENV BATCHSIZE=2
+ENV BATCHSIZE=1
 
 RUN mkdir ./tmp
 RUN mkdir ./stats
@@ -24,6 +24,8 @@ RUN  pip install tensorflow-serving-api
 
 COPY ./mnist_input_data.py .
 COPY ./locust_grpc_batch.py .
+# Copy locust config file, configurations can be overriden by env variables
+#COPY
 
 RUN ulimit -n 200000
 
