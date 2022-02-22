@@ -51,7 +51,7 @@ container by providing a local directory where the container can store
 the logs.
 
 ```
-docker run --mount type=bind,source=/home/stats,target=/usr/src/app/stats -e "SERVER=http://127.x.x.x" -e "BATCHSIZE=4" rest_batch_locust
+docker run --mount type=bind,source=/home/stats,target=/usr/src/app/stats -e "SERVER=127.x.x.x" -e "BATCHSIZE=4" rest_batch_locust
 
 ```
 The resulting statistics files are stored in a stats folder.
