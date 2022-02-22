@@ -28,13 +28,13 @@ grpc_gevent.init_gevent()
 stats.CSV_STATS_INTERVAL_SEC = 1 # default is 1 second
 stats.CSV_STATS_FLUSH_INTERVAL_SEC = 10 # frequency of data flushing to disk, default is 10 seconds
 
-work_dir = '/tmp'
+work_dir = './tmp'
 test_data_set = mnist_input_data.read_data_sets(work_dir).test
 
 batch_size = 1
 image, label = test_data_set.next_batch(batch_size)
 batch = np.repeat(image[0], batch_size, axis=0).tolist()
-print(label, image[0].size)
+print(label, image.size)
 
 class GrpcClient:
     def __init__(self, environment, stub):
