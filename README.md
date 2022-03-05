@@ -7,8 +7,18 @@ Reviewing inference setup, effect of various variables to the inference rate in 
 * Conduct benchmark against a [REST](https://www.bswen.com/2019/08/others-Use-Apache-Bench(ab)-command-to-test-RESTful-apis-example.html) API testing tool
 Results from these tools help to  establish the reliability of our own implementation.
 * Test the feasibility of using [wireshark](https://www.wireshark.org/) to see low level traffic
-* Testing the effect of power using the [PowerAPI](http://powerapi.org/)
 * Adopt [locust](https://docs.locust.io/en/stable/index.html) testing framework
+* Adopt Prometheus for monitoring
+
+## Outstanding issues
+* Testing the effect of power using the [PowerAPI](http://powerapi.org/)
+
+This has been tested and it turns out it requires adopting specific
+linux kernels for the sensors to work. Most of the other PowerAPI
+systems similarly do not work presumably due to this kernel
+issue. There is an an open [github
+issue](https://github.com/powerapi-ng/powerapi/issues/125) related to
+problem.
 
 Open Questions
 * How much of that time is spent by the model inference itself not transport layer handshakes
@@ -122,3 +132,34 @@ local machine.
 There is a good
 [tutorial](https://opensource.com/article/20/1/wireshark-linux-tshark)
 on how to use tshark.
+
+## Monitoring
+
+Prometheus is adopted for monitoring of the server containers.
+
+Docker already [exposes
+prometheus](https://prometheus.io/docs/instrumenting/exporters/) like
+metrics that allows the prometheus server to pull metrics from docker
+without other additional tooling. It is however required to run docker
+in
+[experimental](https://docs.docker.com/engine/reference/commandline/dockerd/)
+mode and create a daemon.json file under /etc/docker/. The json
+contains the key value items.
+
+```
+{
+    "metrics-addr": "127.0.0.1:9323",
+    "experimental": true
+}
+```
+
+After this has been file is created, the docker daemon needs to be
+restarted. If any containers were running, they need to be stopped
+otherwise they will be zombied and not visible from the container
+listings.
+
+```
+sudo systemctl restart docker
+```
+After successful restart, running the command ```docker version```
+will indicated Experimental:true listed in the output.
