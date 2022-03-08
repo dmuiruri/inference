@@ -20,7 +20,7 @@ from locust import HttpUser, FastHttpUser, task, tag, between, stats, run_single
 stats.CSV_STATS_INTERVAL_SEC = 1 # default is 1 second
 stats.CSV_STATS_FLUSH_INTERVAL_SEC = 10 # Determines how often the data is flushed to disk, default is 10 seconds
 
-img_fh = open('0.png', 'rb')
+img_fh = open('9.png', 'rb') # ToDo: load data dynamically
 img = img_fh.read()
 
 # batch_size = 1

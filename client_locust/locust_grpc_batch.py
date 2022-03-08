@@ -28,14 +28,15 @@ grpc_gevent.init_gevent()
 
 stats.CSV_STATS_INTERVAL_SEC = 1 # default is 1 second
 stats.CSV_STATS_FLUSH_INTERVAL_SEC = 10 # frequency of data flushing to disk, default is 10 seconds
+stats.PERCENTILES_TO_REPORT = [25, 50, 75, 95]
 
 work_dir = './tmp'
 test_data_set = mnist_input_data.read_data_sets(work_dir).test
 
 batch_size = int(os.environ['BATCHSIZE'])
-image, label = test_data_set.next_batch(batch_size)
-batch = np.repeat(image[0], batch_size, axis=0).tolist()
-print(label, image[0].size)
+image, labels = test_data_set.next_batch(batch_size)
+batch = np.repeat(image[0], batch_size, axis=0).tolist() # redundant, we can pass image directly
+print(f'labels: {labels}, image size: {image.size}, image type: {type(image)}, batch size: {len(batch)}')
 
 class GrpcClient:
     def __init__(self, environment, stub):
@@ -101,13 +102,16 @@ class SingleGrpcUser(GrpcUser):
         """
         Get prediction for a single image
         """
-        self.request = self.prepare_grpc_request('mnist', 'predict_images', batch)
+        self.request = self.prepare_grpc_request('mnist', 'predict_images', image)
         if not self._channel_closed:
 
             # Returns a PredictResponse Object which contains the
             # probabilities of the classes 0-9, so we need to pick the
             # highest probability to determine the prediction. 
             response = self.client.Predict(self.request, timeout=None)  #5 seconds
+            sys.stdout.write('*') #(print(response)
+            sys.stdout.flush()
+            time.sleep(5)
             return
 
 
