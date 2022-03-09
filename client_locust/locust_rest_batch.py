@@ -20,9 +20,9 @@ import tensorflow as tf
 from locust import HttpUser, FastHttpUser, task, tag, between, stats, run_single_user
 import mnist_input_data
 
-# stats.CSV_STATS_INTERVAL_SEC = 1 # default is 1 second
-# stats.CSV_STATS_FLUSH_INTERVAL_SEC = 10 # Determines how often the data is flushed to disk, default is 10 seconds
-# stats.PERCENTILES_TO_REPORT = [25, 50, 75, 95]
+stats.CSV_STATS_INTERVAL_SEC = 1 # default is 1 second
+stats.CSV_STATS_FLUSH_INTERVAL_SEC = 10 # Determines how often the data is flushed to disk, default is 10 seconds
+stats.PERCENTILES_TO_REPORT = [25, 50, 75, 95]
 work_dir = './tmp'
 
 test_data_set = mnist_input_data.read_data_sets(work_dir).test
