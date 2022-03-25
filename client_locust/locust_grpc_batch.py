@@ -26,8 +26,8 @@ from locust import HttpUser, User, task, tag, between, stats, run_single_user
 
 grpc_gevent.init_gevent()
 
-stats.CSV_STATS_INTERVAL_SEC = 1 # default is 1 second
-stats.CSV_STATS_FLUSH_INTERVAL_SEC = 10 # frequency of data flushing to disk, default is 10 seconds
+# stats.CSV_STATS_INTERVAL_SEC = 1 # default is 1 second
+# stats.CSV_STATS_FLUSH_INTERVAL_SEC = 10 # frequency of data flushing to disk, default is 10 seconds
 
 work_dir = './tmp'
 test_data_set = mnist_input_data.read_data_sets(work_dir).test
@@ -87,6 +87,8 @@ class SingleGrpcUser(GrpcUser):
     host = os.environ['SERVER']
     stub_class = prediction_service_pb2_grpc.PredictionServiceStub
     request = predict_pb2.PredictRequest()
+    def __init__(self):
+        self.request = None
 
     def prepare_grpc_request(self, model_name, signature_name, data):
         request = predict_pb2.PredictRequest()
@@ -96,22 +98,25 @@ class SingleGrpcUser(GrpcUser):
             tf.make_tensor_proto(data, shape=[batch_size, image[0].size], dtype=None))
         return request
 
+    self.request = self.prepare_grpc_request('mnist', 'predict_images', batch)
+
     @task
     def predict_single(self):
         """
         Get prediction for a single image
         """
-        self.request = self.prepare_grpc_request('mnist', 'predict_images', batch)
         if not self._channel_closed:
 
             # Returns a PredictResponse Object which contains the
             # probabilities of the classes 0-9, so we need to pick the
-            # highest probability to determine the prediction. 
+            # highest probability to determine the prediction.
             response = self.client.Predict(self.request, timeout=None)  #5 seconds
+            print(response)
+            time.sleep(20)
             return
 
 
 if __name__ == "__main__":
     run_single_user(SingleGrpcUser)
-    # cmd = 'locust -f locust_grpc_single.py --headless --csv=rest --csv-full-history -u 100 -r 10 --run-time 5m'
+    # cmd = 'locust -f locust_grpc_single.py --headless --csv=grpc --csv-full-history -u 100 -r 10 --run-time 5m --stop-timeout=60'
     # subprocess.run(cmd, shell=True)

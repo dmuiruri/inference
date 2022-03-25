@@ -30,20 +30,19 @@ import mnist_input_data
 
 work_dir = '/tmp'
 #response_times = list()
+batch_size=1
 
 test_data_set = mnist_input_data.read_data_sets(work_dir).test
+img, label = test_data_set.next_batch(batch_size)
+batch = img.tolist()
 
 def prepare_data():
-    img, label = test_data_set.next_batch(1)
-    batch_size = 1
-    batch = np.repeat(img, batch_size, axis=0).tolist()
     test_data = {
         "signature_name": 'predict_images',
         "instances": batch
     }
     return test_data
 
-json_data = prepare_data()
 
 def get_predictions():
     """Inference querying
@@ -53,15 +52,12 @@ def get_predictions():
 
     number = np.argmax(response_prediction.json()['predictions'][0])
     """
-    # sys.stdout.write('.')
-    # sys.stdout.flush()
-    # start = time()
-    # response_prediction = requests.post('http://128.214.252.11:8501/v1/models/mnist:predict', json=json_data)
-    # elapsed = time() - start
-    return requests.post('http://128.214.252.11:8501/v1/models/mnist:predict', json=json_data).elapsed.total_seconds()
+    json_data = prepare_data()
+    response = requests.post('http://128.214.252.11:8501/v1/models/mnist:predict', json=json_data)
+    return response.elapsed.total_seconds()
 
 def run_performance_tests(iterations=10):
     return [get_predictions() for _ in range(iterations)]
 
 if __name__ == '__main__':
-    print(run_performance_tests())
+    print(run_performance_tests(iterations=100))

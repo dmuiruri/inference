@@ -74,14 +74,13 @@ async def async_inference(session):
     start = time()
     async with session.post('http://128.214.252.11:8501/v1/models/mnist:predict', json=json_data) as resp:
         sys.stdout.write('.')
-        sys.stdout.write(resp)
-        break
+        # sys.stdout.write(resp.json())
         sys.stdout.flush()
-        resp_status = resp.status
-        resp_time = resp.elapsed.total_seconds()
+        # resp_status = resp.status
+        # resp_time = resp.elapsed.total_seconds()
         await resp.text()
     elapsed = time() - start
-    response_times.append(resp_time)#(elapsed)
+    response_times.append(elapsed)#resp_time
 
 # async def async_collect_inferences(num=10):
 #     """
