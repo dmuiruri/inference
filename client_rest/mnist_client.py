@@ -16,7 +16,8 @@
 #!/usr/bin/env python
 
 import sys
-import threading
+from threading import Thread
+import concurrent.futures
 import requests
 import numpy as np
 import pandas as pd
@@ -32,36 +33,58 @@ import mnist_input_data
 
 work_dir = '/tmp'
 #response_times = list()
-batch_size = 16
+batch_size = 1
 
 test_data_set = mnist_input_data.read_data_sets(work_dir).test
-img, label = test_data_set.next_batch(batch_size)
-batch = img.tolist()
+def create_arr_batch(batch_size):
+    img, label = test_data_set.next_batch(batch_size)
+    batch = img.tolist()
+    return batch
 
-with open('0.png', 'rb') as payload:
-    img_str = np.repeat(payload.read(), batch_size, axis=0).tolist()
+def create_str_batch(batch_size):
+    with open('0.png', 'rb') as payload:
+        img_str = np.repeat(payload.read(), batch_size, axis=0).tolist()
+    return img_str
 
-def test_serialize_arr():
-    start = time()
+def test_serialize_arr(batch): 
+    #batch = create_arr_batch(i)
     json_data = {
         "signature_name": 'predict_images',
         "instances": batch
     }
+    start = time()
     with requests.Session() as sess:
         req = requests.Request("post", 'http://128.214.252.11:8501/v1/models/mnist:predict', json=json_data)
         prepared_req = sess.prepare_request(req)
     return float(time() - start)
 
-def test_serialize_string():
+def test_serialize_string(json_data):
     start = time()
-    json_data = {
-        "signature_name": 'predict_images',
-        "instances":[{'b64': base64.b64encode(s).decode('utf-8')} for s in img_str]
-    }
     with requests.Session() as sess:
         req = requests.Request("post", 'http://128.214.252.11:8501/v1/models/mnist:predict', json=json_data)
         prepared_req = sess.prepare_request(req)
     return float(time() - start)
+
+def str_serialization_tests(batch_size):
+    print(f'str batch size: {batch_size}')
+    batch = create_str_batch(batch_size)
+    json_data = {
+        "signature_name": 'predict_images',
+        "instances":[{'b64': base64.b64encode(s).decode('utf-8')} for s in batch]
+    }
+    reqs_time = [test_serialize_string(json_data) for _ in range(500)]
+    return reqs_time
+
+def run_serialization_tests():
+    df = pd.DataFrame(index=range(500))
+    for batchsize in [4, 16, 64, 256, 1024]:
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            futures = [executor.submit(str_serialization_tests, b) for b in [batchsize]] # , 16, 64, 256, 1024
+            res = [f.result() for f in concurrent.futures.as_completed(futures)]
+        df[f'{batchsize}']=np.reshape(res,(500, 1)) #columns=[4, 16, 64, 256, 1024]
+    print('saving results to csv file...')
+    df.to_csv('str_batch.csv')
+    return
 
 def predict_string():
     # payload = data.read()
@@ -79,14 +102,6 @@ def predict_string():
     response = requests.post('http://128.214.252.11:8501/v1/models/mnist:predict', json=json_data)
     print(response.json())
     return response.elapsed.total_seconds()
-    
-    
-def prepare_data():
-    test_data = {
-        "signature_name": 'predict_images',
-        "instances": batch
-    }
-    return test_data
 
 def get_predictions():
     """Inference querying
@@ -101,13 +116,16 @@ def get_predictions():
     print(response.json())
     return response.elapsed.total_seconds()
 
-def run_performance_tests_no_serialization(iterations=10):
-    return [get_predictions() for _ in range(iterations)]
+def arr_serialization_tests():
+    results = {}
+    for i in [4, 16, 64, 256, 1024, 4096]:
+        print(f'arr batch size: {i}')
+        batch = create_arr_batch(i)
+        arr_res = [test_serialize_arr(batch) for _ in range(1000)]
+        results[f'arr_{i}'] = pd.Series(arr_res).describe()
+    print('Saving csv file...')
+    pd.DataFrame(results).to_csv('arr_rest.csv')
+    return 
 
 if __name__ == '__main__':
-    # print(predict_string())
-    # print(run_performance_tests_no_serialization(iterations=1))
-    print(img.shape)
-    print([test_serialize_arr() for _ in range(100)])
-    print('>>>')
-    print([test_serialize_string() for _ in range(100)])
+    print(run_serialization_tests())
