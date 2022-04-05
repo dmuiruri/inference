@@ -45,6 +45,7 @@ def create_str_batch(batch_size):
         img_str = np.repeat(payload.read(), batch_size, axis=0).tolist()
     return img_str
 
+### Array tests
 def test_serialize_arr(json_data):
     start = time()
     with requests.Session() as sess:
@@ -53,7 +54,6 @@ def test_serialize_arr(json_data):
     return float(time() - start)
 
 def arr_serialization_tests(batch):
-    results = {}
     print(f'arr batch size: {batch}') 
     batch = create_arr_batch(batch)
     json_data = {
@@ -103,36 +103,6 @@ def run_str_serialization_tests():
     df.to_csv('str_batch.csv')
     return
 
-def predict_string():
-    # payload = data.read()
-    # encoded_image = base64.b64encode(payload).decode('utf-8')
-    # instance = [{"b64": encoded_image}]
-    # return json.dumps({"instances": instance})
-
-    with open('0.png', 'rb') as payload:
-        img = payload.read()
-    img_encoded = base64.b64encode(img).decode('utf-8')
-    json_data = {
-        "signature_name": 'predict_images',
-        "instances": [{'b64': img_encoded}]
-    }
-    response = requests.post('http://128.214.252.11:8501/v1/models/mnist:predict', json=json_data)
-    print(response.json())
-    return response.elapsed.total_seconds()
-
-def get_predictions():
-    """Inference querying
-    
-    Predict returns the probabilities of the classes 0-9, so we need
-    to pick the highest probability
-
-    number = np.argmax(response_prediction.json()['predictions'][0])
-    """
-    json_data = prepare_data()
-    response = requests.post('http://128.214.252.11:8501/v1/models/mnist:predict', json=json_data)
-    print(response.json())
-    return response.elapsed.total_seconds()
-
 if __name__ == '__main__':
-#    print(run_str_serialization_tests())
+    print(run_str_serialization_tests())
     print(run_arr_serialization_tests())
