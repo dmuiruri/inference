@@ -12,7 +12,7 @@ import mnist_input_data
 
 work_dir = '/tmp'
 test_data_set = mnist_input_data.read_data_sets(work_dir).test
-number_of_tests = 100 # 500
+number_of_tests = 20 # 500
 
 def create_arr_batch(batch_size):
     """Create a batch of a given size
@@ -122,13 +122,7 @@ if __name__ == '__main__':
     #run_arr_requests()
 
     # Collecting tensorboard metrics using default arr datatypes
-    
-    # perform_multiple_arr_requests(4)
-    # perform_multiple_arr_requests(16)
-    # perform_multiple_arr_requests(64)
-    # perform_multiple_arr_requests(256)
-    perform_multiple_arr_requests(1024)
-
+    perform_multiple_arr_requests(32)
 
     # TODO:  Need to re-compile the model to accept string otherwise expects
     # float type
