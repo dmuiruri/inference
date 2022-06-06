@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import warnings
 from time import time
 import requests
+import sys
 
 def load_image_into_tensor(path):
     """Load an image from file into a tensor
@@ -21,7 +22,8 @@ def load_image_into_tensor(path):
 
     """
     image_np = np.array(Image.open(path))
-    print('file opened')
+    # img_batch = np.repeat(image_np, batch_size, axis=0)#.tolist() How to perform batch inference in these models.
+    print(f'image file opened')
     input_tensor = tf.convert_to_tensor(np.expand_dims(image_np, 0), dtype=tf.uint8)
     print('tensor created')
     return input_tensor.numpy().tolist()
@@ -31,11 +33,11 @@ def test_requests_arr():
     Perform a single complete request to the server
     """
     img_inf = load_image_into_tensor('./image3.jpg')
-    start = time()
     json_data = {
         "signature_name": 'serving_default',
         "instances": img_inf
     }
+    start = time()
     with requests.Session() as sess:
         req = requests.Request("post", 'http://128.214.252.11:8501/v1/models/centernet_hg_1024:predict',
                                json=json_data)
@@ -47,23 +49,19 @@ def test_requests_arr():
     print(f'{perf}')
     sys.stdout.write('.')
     sys.stdout.flush()
-    return perf
+    return response
 
-def perform_multiple_arr_requests(batch):
+def perform_multiple_arr_requests(number_of_reqs):
     """Send multiple requests.
 
     For statistical stability of results, we perform multiple requests
     to get a general distribution of the performance.
 
     """
-    batch = create_arr_batch(batch)
-    json_data = {
-        "signature_name": 'predict_images',
-        "instances": batch
-    }
-    arr_res = [test_requests_arr(json_data) for _ in range(number_of_tests)]
+    arr_res = [test_requests_arr() for _ in range(number_of_reqs)]
     return arr_res
 
 if __name__ == '__main__':
-    # print(load_image_into_tensor('./image1.jpg'))
-    print(test_requests_arr())
+    # image = load_image_into_tensor('./image1.jpg')
+    print(test_requests_arr().json())
+    # perform_multiple_arr_requests(2) # warmup and test test request
