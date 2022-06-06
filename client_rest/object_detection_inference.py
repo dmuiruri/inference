@@ -31,6 +31,11 @@ def load_image_into_tensor(path):
 def test_requests_arr():
     """
     Perform a single complete request to the server
+
+    Different model URLs
+    http://128.214.252.11:8501/v1/models/centernet_hg_1024:predict
+    http://128.214.252.11:8501/v1/models/centernet_hg_512:predict
+    http://128.214.252.11:8501/v1/models/centernet_resnet50_512:predict
     """
     img_inf = load_image_into_tensor('./image3.jpg')
     json_data = {
@@ -39,7 +44,7 @@ def test_requests_arr():
     }
     start = time()
     with requests.Session() as sess:
-        req = requests.Request("post", 'http://128.214.252.11:8501/v1/models/centernet_hg_1024:predict',
+        req = requests.Request("post", 'http://128.214.252.11:8501/v1/models/centernet_resnet50_512:predict',
                                json=json_data)
         prepared_req = sess.prepare_request(req)
         response = sess.send(prepared_req)
@@ -63,5 +68,5 @@ def perform_multiple_arr_requests(number_of_reqs):
 
 if __name__ == '__main__':
     # image = load_image_into_tensor('./image1.jpg')
-    print(test_requests_arr().json())
-    # perform_multiple_arr_requests(2) # warmup and test test request
+    # print(test_requests_arr())
+    perform_multiple_arr_requests(2) # warmup and test test request
