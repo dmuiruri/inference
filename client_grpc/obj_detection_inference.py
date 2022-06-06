@@ -7,9 +7,8 @@ import sys
 from PIL import Image
 from tensorflow_serving.apis import predict_pb2
 from tensorflow_serving.apis import prediction_service_pb2_grpc
-from grpc.beta import implementations
 
-model_name = 'centernet_hg_1024'
+model_name = 'centernet_resnet50_512' #'centernet_hg_512' 'centernet_hg_1024'
 signature_name = 'serving_default'
 hostport = '8500'
 input_name = 'input_tensor'
@@ -29,33 +28,44 @@ def load_image_into_tensor(path):
 
     """
     image_np = np.array(Image.open(path))
-    # img_batch = np.repeat(image_np, batch_size, axis=0)#.tolist() How to perform batch inference in these models.
     print(f'image file opened')
     input_tensor = tf.convert_to_tensor(np.expand_dims(image_np, 0), dtype=tf.uint8)
     print('tensor created')
-    #return input_tensor.numpy().tolist()
     return input_tensor
 
 def prepare_grpc_full_request():
     request = predict_pb2.PredictRequest()
     request.model_spec.name = model_name
     request.model_spec.signature_name = signature_name
-    # img, label = test_data_set.next_batch(batchsize)
     img = load_image_into_tensor('./image3.jpg')
     request.inputs[input_name].CopyFrom(
-        tf.make_tensor_proto(img, dtype=None)) #tf.make_tensor_proto(img[0], shape=[1, img[0].size], dtype=None))
+        tf.make_tensor_proto(img, dtype=None))
     return request
 
-def test_requests_arr(): #data
+def test_requests_arr():
     """Test grpc request and receive and response
 
     """
     req = prepare_grpc_full_request()
+    start = time.time()
     resp = stub.Predict(req, timeout=600)
+    perf = time.time() - start
     #print(f'{resp}')
     sys.stdout.write('.')
     sys.stdout.flush()
-    return resp
+    print(perf)
+    return perf
+
+def perform_multiple_arr_requests(number_of_reqs):
+    """Send multiple requests.
+
+    For statistical stability of results, we perform multiple requests
+    to get a general distribution of the performance.
+
+    """
+    arr_res = [test_requests_arr() for _ in range(number_of_reqs)]
+    return arr_res
 
 if __name__ == '__main__':
-    print(test_requests_arr())
+    # test_requests_arr()
+    perform_multiple_arr_requests(2)
