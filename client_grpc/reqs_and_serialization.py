@@ -46,8 +46,8 @@ signature_name = 'predict_images'
 hostport = '8500'
 input_name = 'images'
 input_type = None
-batch_size = 16
-number_of_tests = 20 #500
+batch_size = 4
+number_of_tests = 100 #500
 work_dir = './tmp'
 #response_times = list()
 test_data_set = mnist_input_data.read_data_sets(work_dir).test
@@ -79,7 +79,7 @@ def prepare_grpc_request(model_name, signature_name, data):
     return float(time.time() - start)
 
 def create_arr_batch(batch_size):
-    print(f'Batch size: {img.shape}')
+    # print(f'Batch size: {img.shape}')
     batch = np.repeat(img[0], batch_size, axis=0).tolist()
     return batch
 
@@ -94,23 +94,23 @@ def serialize_arr(batch_size):
     arr_res = [prepare_grpc_request(model_name, signature_name, batch) for _ in range(number_of_tests)]
     return arr_res
 
-def test_requests_arr(mn, sn, data):
+def test_requests_arr(mn, sn): #data
     """Test grpc request and receive and response
 
     """
-    req = prepare_grpc_full_request(mn, sn)
+    req = prepare_grpc_full_request(mn, sn, batch_size)
     resp = stub.Predict(req, timeout=600)
     #print(f'{resp}')
     sys.stdout.write('.')
     sys.stdout.flush()
     return resp
 
-def perform_multiple_arr_requests():
+def perform_multiple_arr_requests(b):
     """
     Perform multiple GRPC requests
     """
-#    data = create_arr_batch(b)
-    arr_resp = [test_requests_arr(model_name, signature_name, batch) for _ in range(number_of_tests)]
+    data = create_arr_batch(b)
+    arr_resp = [test_requests_arr(model_name, signature_name) for _ in range(number_of_tests)]
     return arr_resp
 
 def run_str_serialization_tests():
@@ -143,7 +143,7 @@ if __name__ == '__main__':
     # run_arr_serialization_tests()
 
     # Testing full response on tensorboard
-    perform_multiple_arr_requests()
+    perform_multiple_arr_requests(batch_size)
 
     # ToDo
     # Implement str based requests
