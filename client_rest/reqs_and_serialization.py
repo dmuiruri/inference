@@ -12,7 +12,7 @@ import mnist_input_data
 
 work_dir = '/tmp'
 test_data_set = mnist_input_data.read_data_sets(work_dir).test
-number_of_tests = 200 # 500
+number_of_tests = 10 # 500
 
 def create_arr_batch(batch_size):
     """Create a batch of a given size
@@ -106,7 +106,7 @@ def run_arr_requests():
 
     """
     df = pd.DataFrame(index=range(number_of_tests))
-    for batchsize in [4, 16, 64, 256, 1024]: #
+    for batchsize in [4, 16, 64, 256, 1024, 4096]: #
         print(f'arr batch size: {batchsize}')
         with concurrent.futures.ThreadPoolExecutor() as executor:
             futures = [executor.submit(perform_multiple_arr_requests, b) for b in [batchsize]]
@@ -119,7 +119,7 @@ def run_arr_requests():
     
 if __name__ == '__main__':
     # Testing arr requests
-    #run_arr_requests()
+    run_arr_requests()
 
     # Collecting tensorboard metrics using default arr datatypes
     
@@ -129,8 +129,9 @@ if __name__ == '__main__':
     # perform_multiple_arr_requests(128)
     # perform_multiple_arr_requests(256)
     # perform_multiple_arr_requests(1024)
-    perform_multiple_arr_requests(4096)
+    # perform_multiple_arr_requests(4096)
 
     # TODO:  Need to re-compile the model to accept string otherwise expects
     # float type
     # perform_multiple_str_requests(1)
+    # Also clean this file to work in a modular manner like the grpc counterpart.

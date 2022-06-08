@@ -47,7 +47,7 @@ hostport = '8500'
 input_name = 'images'
 input_type = None
 batch_size = 4096
-number_of_tests = 200 #500
+number_of_tests = 500
 work_dir = './tmp'
 #response_times = list()
 test_data_set = mnist_input_data.read_data_sets(work_dir).test
@@ -85,7 +85,7 @@ def create_arr_batch(batch_size):
 
 def serialize_str(batch_size):
     with open('0.png', 'rb') as payload:
-        img_str = np.repeat(payload.read(), batch_size, axis=0).tolist()
+        img_str = np.repeat(base64.b64encode(payload.read()).decode('utf-8'), batch_size, axis=0).tolist()
     str_res = [prepare_grpc_request(model_name, signature_name, img_str) for _ in range(number_of_tests)]
     return str_res
 
@@ -115,19 +115,19 @@ def perform_multiple_arr_requests(b):
 
 def run_str_serialization_tests():
     df = pd.DataFrame(index=range(number_of_tests))
-    for batchsize in [4, 16, 64, 256, 1024]:
+    for batchsize in [4, 16, 64, 256, 1024, 4096]:
         print(f'str: serializing batch size {batchsize}')
         with concurrent.futures.ThreadPoolExecutor() as executor:
             futures = [executor.submit(serialize_str, b) for b in [batchsize]] # , 16, 64, 256, 1024
             res = [f.result() for f in concurrent.futures.as_completed(futures)]
         df[f'{batchsize}']=np.reshape(res,(number_of_tests, 1)) #columns=[4, 16, 64, 256, 1024]
     print('saving results to csv file...')
-    df.to_csv('str_batch_protobuf.csv')
+    df.to_csv('str_batch_protobuf2.csv')
     return
 
 def run_arr_serialization_tests():
     df = pd.DataFrame(index=range(number_of_tests))
-    for batchsize in [4, 16, 64, 256, 1024]:
+    for batchsize in [4, 16, 64, 256, 1024, 4096]:
         print(f'arr: serializing batch size {batchsize}')
         with concurrent.futures.ThreadPoolExecutor() as executor:
             futures = [executor.submit(serialize_arr, b) for b in [batchsize]] # , 16, 64, 256, 1024
@@ -139,11 +139,12 @@ def run_arr_serialization_tests():
 
 if __name__ == '__main__':
 #    print(run_str_serialization_tests())
-    # run_str_serialization_tests()
-    # run_arr_serialization_tests()
+    run_str_serialization_tests()
+    run_arr_serialization_tests()
 
     # Testing full response on tensorboard
-    perform_multiple_arr_requests(batch_size)
+    # perform_multiple_arr_requests(batch_size)
 
     # ToDo
     # Implement str based requests
+B
