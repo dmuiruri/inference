@@ -1,9 +1,9 @@
 # Inference Performance
 In this project we implement a tool to test inference performance in a
 machine learning setting.  The test setup makes use of Tensorflow
-models and the (tensorflow
-serving)[https://www.tensorflow.org/tfx/guide/serving] framework for
-inference serving.
+models and the
+(https://www.tensorflow.org/tfx/guide/serving)[tensorflow serving]
+framework for inference serving.
 
 
 ## Server
