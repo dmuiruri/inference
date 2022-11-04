@@ -7,6 +7,9 @@
 # temporary data files
 tmp/
 
+# feature list or improvements
+todo_list.txt
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

@@ -1,30 +1,10 @@
-# inference
-Reviewing inference setup, effect of various variables to the inference rate in ML setups
+# Inference Performance
+In this project we implement a tool to test inference performance in a
+machine learning setting.  The test setup makes use of Tensorflow
+models and the (tensorflow
+serving)[https://www.tensorflow.org/tfx/guide/serving] framework for
+inference serving.
 
-## TODO Items
-
-* Conduct benchmark against dedicated [gRPC](https://ghz.sh/) test tool
-* Conduct benchmark against a [REST](https://www.bswen.com/2019/08/others-Use-Apache-Bench(ab)-command-to-test-RESTful-apis-example.html) API testing tool
-Results from these tools help to  establish the reliability of our own implementation.
-* Test the feasibility of using [wireshark](https://www.wireshark.org/) to see low level traffic
-* Adopt [locust](https://docs.locust.io/en/stable/index.html) testing framework
-* Adopt Prometheus for monitoring
-
-## Outstanding issues
-* Testing the effect of power using the [PowerAPI](http://powerapi.org/)
-
-This has been tested and it turns out it requires adopting specific
-linux kernels for the sensors to work. Most of the other PowerAPI
-systems similarly do not work presumably due to this kernel
-issue. There is an an open [github
-issue](https://github.com/powerapi-ng/powerapi/issues/125) related to
-problem.
-
-Open Questions
-* How much of that time is spent by the model inference itself not transport layer handshakes
-* Is this a CPU or IO bound problem
-* Is the server applying some form of caching
-* Impact of schema and data type (JSON, Binary, String etc)
 
 ## Server
 We start two independent servers from Tensorflow Serving, each serving the model from independent endpoints/ports
